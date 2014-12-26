@@ -56,6 +56,7 @@ import android.telephony.PhoneNumberUtils;
 import android.telephony.SignalStrength;
 import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
+import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.telephony.Rlog;
 
@@ -177,24 +178,17 @@ public class SamsungU8500RIL extends RIL implements CommandsInterface {
         }
     }
 
-    @Override
-    public void setCurrentPreferredNetworkType() {
-        if (RILJ_LOGD) riljLog("setCurrentPreferredNetworkType IGNORED");
-        /* Google added this as a fix for crespo loosing network type after
-         * taking an OTA. This messes up the data connection state for us
-         * due to the way we handle network type change (disable data
-         * then change then re-enable).
-         */
-    }
-
     private boolean NeedReconnect()
     {
         ConnectivityManager cm =
             (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        TelephonyManager tm =
+            (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
+        
         NetworkInfo ni_active = cm.getActiveNetworkInfo();
 
         return ni_active != null && ni_active.getTypeName().equalsIgnoreCase( "mobile" ) &&
-                ni_active.isConnected() && cm.getMobileDataEnabled();
+                ni_active.isConnected() && tm.getDataEnabled();
     }
 
     @Override
@@ -277,11 +271,11 @@ public class SamsungU8500RIL extends RIL implements CommandsInterface {
             Rlog.d(RILJ_LOG_TAG, "Mobile Dataconnection is online setting it down");
             mDesiredNetworkType = networkType;
             mNetworktypeResponse = response;
-            ConnectivityManager cm =
-                (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+            TelephonyManager tm =
+                (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
             //start listening for the connectivity change broadcast
             startListening();
-            cm.setMobileDataEnabled(false);
+            tm.setDataEnabled(false);
         }
 
         @Override
@@ -289,11 +283,11 @@ public class SamsungU8500RIL extends RIL implements CommandsInterface {
             switch(msg.what) {
             //networktype was set, now we can enable the dataconnection again
             case MESSAGE_SET_PREFERRED_NETWORK_TYPE:
-                ConnectivityManager cm =
-                    (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+                TelephonyManager tm =
+                    (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
 
                 Rlog.d(RILJ_LOG_TAG, "preferred NetworkType set upping Mobile Dataconnection");
-                cm.setMobileDataEnabled(true);
+                tm.setDataEnabled(true);
                 //everything done now call back that we have set the networktype
                 AsyncResult.forMessage(mNetworktypeResponse, null, null);
                 mNetworktypeResponse.sendToTarget();
@@ -348,10 +342,11 @@ public class SamsungU8500RIL extends RIL implements CommandsInterface {
                       // We will print a list of such stale requests which
                       // haven't yet received a response. If the timeout fires
                       // first, then the wakelock is released without debugging.
-                    timeDiff = removalTime - rr.creationTime;
-                    if ( timeDiff > mWakeLockTimeout ) {
+                    
+                    //timeDiff = removalTime - rr.creationTime;
+                    //if ( timeDiff > mWakeLockTimeout ) {
                         Rlog.d(RILJ_LOG_TAG, "No response for [" + rr.mSerial + "] " +
-                                requestToString(rr.mRequest) + " after " + timeDiff + " milliseconds.");
+                                requestToString(rr.mRequest) + "."); // + " after " + timeDiff + " milliseconds.");
 
                         /* Don't actually remove anything for now. Consider uncommenting this to
                            purge stale requests */
@@ -369,7 +364,7 @@ public class SamsungU8500RIL extends RIL implements CommandsInterface {
                         // Samsung RIL
                         rr.release();
                         */
-                    }
+                    //}
                 }
             }
         return null;
