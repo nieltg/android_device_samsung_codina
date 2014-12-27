@@ -119,7 +119,8 @@ BOARD_SUPPRESS_EMMC_WIPE := true
 BOARD_RECOVERY_SWIPE := true
 
 # SELinux
-BOARD_SEPOLICY_DIRS += \
+BOARD_SEPOLICY_DIRS := \
+    $(BOARD_SEPOLICY_DIRS) \
     $(LOCAL_PATH)/sepolicy
 
 BOARD_SEPOLICY_UNION += \
@@ -129,7 +130,6 @@ BOARD_SEPOLICY_UNION += \
     drmserver.te \
     ueventd.te \
     domain.te \
-    system.te \
     file_contexts \
     wpa_supplicant.te \
     vold.te
