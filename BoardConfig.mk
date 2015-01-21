@@ -89,7 +89,7 @@ BOARD_HAVE_BLUETOOTH_BCM := true
 BOARD_BLUEDROID_VENDOR_CONF := $(LOCAL_PATH)/bluetooth/vnd_u8500.txt
 
 # RIL
-BOARD_RIL_CLASS := device/samsung/modem/ril
+BOARD_RIL_CLASS := ../../../device/samsung/codina/modem/ril
 
 # Audio
 BOARD_USES_ALSA_AUDIO := true
