@@ -87,7 +87,7 @@ $(call inherit-product, hardware/u8500/u8500.mk)
 
 # USB
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
-    persist.sys.usb.config=mtp,adb \
+    persist.sys.usb.config=mtp \
     persist.service.adb.enable=1
 
 # Charger
