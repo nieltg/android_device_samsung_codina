@@ -56,7 +56,6 @@ TARGET_GLOBAL_CPPFLAGS += -mtune=cortex-a9 -mfpu=neon -mfloat-abi=softfp
 # Kernel
 BOARD_KERNEL_PAGESIZE := 4096
 BOARD_KERNEL_BASE := 0x40000000
-BOARD_CUSTOM_BOOTIMG_MK := $(LOCAL_PATH)/shbootimg.mk
 
 # Graphics
 USE_OPENGL_RENDERER := true
@@ -148,8 +147,12 @@ COMMON_GLOBAL_CFLAGS += -DNEEDS_VECTORIMPL_SYMBOLS
 TARGET_OTA_ASSERT_DEVICE := codina,i8160,GT-I8160
 
 # Kernel
-TARGET_KERNEL_SOURCE := kernel/samsung/u8500
-TARGET_KERNEL_CONFIG := cyanogenmod_i8160_defconfig
+TARGET_KERNEL_SOURCE := kernel/codina/ace2nutzer
+TARGET_KERNEL_CONFIG := codina_ext4_defconfig
+
+ifeq ($(shell cat $(LOCAL_PATH)/rootdir/fstab.samsungcodina | grep -q mmcblk1p2 ; echo $$?),0)
+TARGET_PREBUILT_KERNEL = $(CODINARAMFS_KERNEL)
+endif
 
 # Bluetooth
 BOARD_BLUETOOTH_BDROID_BUILDCFG_INCLUDE_DIR := $(LOCAL_PATH)/bluetooth/include
