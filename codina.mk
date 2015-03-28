@@ -41,13 +41,13 @@ PRODUCT_PROPERTY_OVERRIDES += \
 
 # Media
 PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/media/omxloaders:system/etc/omxloaders \
-    $(LOCAL_PATH)/media/media_codecs.xml:system/etc/media_codecs.xml \
-    $(LOCAL_PATH)/media/media_profiles.xml:system/etc/media_profiles.xml
+    $(LOCAL_PATH)/configs/omxloaders:system/etc/omxloaders \
+    $(LOCAL_PATH)/configs/media_codecs.xml:system/etc/media_codecs.xml \
+    $(LOCAL_PATH)/configs/media_profiles.xml:system/etc/media_profiles.xml
 
 # Wifi
 PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/wifi/wpa_supplicant.conf:system/etc/wifi/wpa_supplicant.conf
+    $(LOCAL_PATH)/configs/wpa_supplicant.conf:system/etc/wifi/wpa_supplicant.conf
 PRODUCT_PACKAGES += \
     libnetcmdiface
 PRODUCT_PROPERTY_OVERRIDES += \
@@ -57,12 +57,12 @@ $(call inherit-product-if-exists, hardware/broadcom/wlan/bcmdhd/firmware/bcm4330
 
 # Bluetooth
 PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/bluetooth/bt_vendor.conf:system/etc/bluetooth/bt_vendor.conf
+    $(LOCAL_PATH)/configs/bluetooth/bt_vendor.conf:system/etc/bluetooth/bt_vendor.conf
 
 # STE
 PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/board/cspsa.conf:system/etc/cspsa.conf \
-    $(LOCAL_PATH)/board/usbid_init.sh:system/bin/usbid_init.sh
+    $(LOCAL_PATH)/configs/cspsa.conf:system/etc/cspsa.conf \
+    $(LOCAL_PATH)/configs/usbid_init.sh:system/bin/usbid_init.sh
 
 # RIL
 PRODUCT_PROPERTY_OVERRIDES += \
@@ -74,8 +74,8 @@ PRODUCT_PROPERTY_OVERRIDES += \
 
 # Audio
 PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/audio/audio_policy.conf:system/etc/audio_policy.conf \
-    $(LOCAL_PATH)/audio/asound.conf:system/etc/asound.conf
+    $(LOCAL_PATH)/configs/audio_policy.conf:system/etc/audio_policy.conf \
+    $(LOCAL_PATH)/configs/asound.conf:system/etc/asound.conf
 PRODUCT_PACKAGES += \
     audio.usb.default \
     audio.a2dp.default \
@@ -116,9 +116,9 @@ PRODUCT_PACKAGES += \
 
 # Keylayout
 PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/keylayout/gpio-keys.kl:system/usr/keylayout/gpio-keys.kl \
-    $(LOCAL_PATH)/keylayout/sec_touchkey.kl:system/usr/keylayout/sec_touchkey.kl \
-    $(LOCAL_PATH)/keylayout/simple_remote.kl:system/usr/keylayout/simple_remote.kl
+    $(LOCAL_PATH)/configs/keylayout/gpio-keys.kl:system/usr/keylayout/gpio-keys.kl \
+    $(LOCAL_PATH)/configs/keylayout/sec_touchkey.kl:system/usr/keylayout/sec_touchkey.kl \
+    $(LOCAL_PATH)/configs/keylayout/simple_remote.kl:system/usr/keylayout/simple_remote.kl
 
 # These are the hardware-specific features
 PRODUCT_COPY_FILES += \
@@ -197,13 +197,13 @@ PRODUCT_COPY_FILES += \
     
 # STE Modem
 PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/modem/ste_modem.sh:system/etc/ste_modem.sh
+    $(LOCAL_PATH)/configs/ste_modem.sh:system/etc/ste_modem.sh
 
 # Audio
 PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/audio/adm.sqlite-u8500:system/etc/adm.sqlite-u8500
+    $(LOCAL_PATH)/configs/adm.sqlite-u8500:system/etc/adm.sqlite-u8500
 
 # GPS
 PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/gps/gps.conf:system/etc/gps.conf
+    $(LOCAL_PATH)/configs/gps.conf:system/etc/gps.conf
 

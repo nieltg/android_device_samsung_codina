@@ -62,7 +62,7 @@ USE_OPENGL_RENDERER := true
 BOARD_EGL_WORKAROUND_BUG_10194508 := true
 TARGET_RUNNING_WITHOUT_SYNC_FRAMEWORK := true
 COMMON_GLOBAL_CFLAGS += -DFORCE_SCREENSHOT_CPU_PATH
-BOARD_EGL_CFG := $(LOCAL_PATH)/graphics/egl.cfg
+BOARD_EGL_CFG := $(LOCAL_PATH)/configs/egl.cfg
 
 # Wifi
 BOARD_WLAN_DEVICE                := bcmdhd
@@ -85,10 +85,10 @@ BOARD_NO_APSME_ATTR              := true
 # Bluetooth
 BOARD_HAVE_BLUETOOTH := true
 BOARD_HAVE_BLUETOOTH_BCM := true
-BOARD_BLUEDROID_VENDOR_CONF := $(LOCAL_PATH)/bluetooth/vnd_u8500.txt
+BOARD_BLUEDROID_VENDOR_CONF := $(LOCAL_PATH)/configs/bluetooth/vnd_u8500.txt
 
 # RIL
-BOARD_RIL_CLASS := ../../../device/samsung/codina/modem/ril
+BOARD_RIL_CLASS := ../../../device/samsung/codina/configs/ril
 
 # Audio
 BOARD_USES_ALSA_AUDIO := true
@@ -108,9 +108,9 @@ TARGET_USE_CUSTOM_LUN_FILE_PATH := "/sys/devices/platform/musb-ux500.0/musb-hdrc
 BOARD_CHARGING_MODE_BOOTING_LPM := /sys/devices/virtual/power_supply/battery/lpm_mode
 
 # Recovery
-BOARD_CUSTOM_GRAPHICS := $(LOCAL_PATH)/recovery/graphics.c
+BOARD_CUSTOM_GRAPHICS := $(LOCAL_PATH)/configs/recovery/graphics.c
 BOARD_UMS_LUNFILE := "/sys/devices/platform/musb-ux500.0/musb-hdrc/gadget/lun0/file"
-BOARD_CUSTOM_RECOVERY_KEYMAPPING := $(LOCAL_PATH)/recovery/recovery_keys.c
+BOARD_CUSTOM_RECOVERY_KEYMAPPING := $(LOCAL_PATH)/configs/recovery/recovery_keys.c
 BOARD_USES_MMCUTILS := true
 BOARD_HAS_NO_MISC_PARTITION := true
 BOARD_HAS_NO_SELECT_BUTTON := true
@@ -155,7 +155,7 @@ TARGET_PREBUILT_KERNEL = $(CODINARAMFS_KERNEL)
 endif
 
 # Bluetooth
-BOARD_BLUETOOTH_BDROID_BUILDCFG_INCLUDE_DIR := $(LOCAL_PATH)/bluetooth/include
+BOARD_BLUETOOTH_BDROID_BUILDCFG_INCLUDE_DIR := $(LOCAL_PATH)/configs/bluetooth/include
 
 # Recovery
 TARGET_RECOVERY_FSTAB := $(LOCAL_PATH)/rootdir/fstab.samsungcodina
