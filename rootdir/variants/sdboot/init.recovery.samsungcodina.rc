@@ -14,8 +14,8 @@ on early-fs
     mkdir /mnt 0775 root root
     mkdir /mnt/.lfs 0755 root root
 
-    insmod /system/lib/modules/j4fs.ko
-    insmod /system/lib/modules/param.ko
+    insmod /lib/modules/j4fs.ko
+    insmod /lib/modules/param.ko
 
     mount j4fs /dev/block/mmcblk0p1 /mnt/.lfs wait
 

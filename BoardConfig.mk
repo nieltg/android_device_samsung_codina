@@ -20,6 +20,12 @@ LOCAL_PATH := device/samsung/codina
 TARGET_SPECIFIC_HEADER_PATH := $(LOCAL_PATH)/include
 PRODUCT_VENDOR_KERNEL_HEADERS := $(LOCAL_PATH)/kernel-headers
 
+# Codinaramfs sdboot
+
+ifeq ($(shell cat $(LOCAL_PATH)/rootdir/fstab.samsungcodina | grep -q mmcblk1p2 ; echo $$?),0)
+DEVICE_CODINA_ENABLE_SDBOOT := true
+endif
+
 # Board
 TARGET_NO_BOOTLOADER := true
 TARGET_NO_RADIOIMAGE := true
@@ -71,7 +77,13 @@ BOARD_WPA_SUPPLICANT_DRIVER      := NL80211
 BOARD_WPA_SUPPLICANT_PRIVATE_LIB := lib_driver_cmd_bcmdhd
 BOARD_HOSTAPD_DRIVER             := NL80211
 BOARD_HOSTAPD_PRIVATE_LIB        := lib_driver_cmd_bcmdhd
+
+ifeq ($(DEVICE_CODINA_ENABLE_SDBOOT),true)
+WIFI_DRIVER_MODULE_PATH          := "/lib/modules/dhd.ko"
+else
 WIFI_DRIVER_MODULE_PATH          := "/system/lib/modules/dhd.ko"
+endif
+
 WIFI_DRIVER_FW_PATH_PARAM        := "/sys/module/dhd/parameters/firmware_path"
 WIFI_DRIVER_FW_PATH_STA          := "/system/etc/wifi/bcmdhd_sta.bin"
 WIFI_DRIVER_FW_PATH_AP           := "/system/etc/wifi/bcmdhd_apsta.bin"
@@ -150,7 +162,7 @@ TARGET_OTA_ASSERT_DEVICE := codina,i8160,GT-I8160
 TARGET_KERNEL_SOURCE := kernel/codina/ace2nutzer
 TARGET_KERNEL_CONFIG := codina_ext4_defconfig
 
-ifeq ($(shell cat $(LOCAL_PATH)/rootdir/fstab.samsungcodina | grep -q mmcblk1p2 ; echo $$?),0)
+ifeq ($(DEVICE_CODINA_ENABLE_SDBOOT),true)
 TARGET_PREBUILT_KERNEL = $(CODINARAMFS_KERNEL)
 endif
 
