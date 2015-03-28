@@ -170,6 +170,11 @@ public class SamsungU8500RIL extends RIL implements CommandsInterface {
         mQANElements = 5;
     }
 
+    public SamsungU8500RIL(Context context, int networkMode, int cdmaSubscription, Integer instanceId) {
+        super(context, networkMode, cdmaSubscription, instanceId);
+        mQANElements = 5;
+    }
+
     static String
     requestToString(int request) {
         switch (request) {
@@ -180,11 +185,7 @@ public class SamsungU8500RIL extends RIL implements CommandsInterface {
 
     private boolean NeedReconnect()
     {
-        ConnectivityManager cm =
-            (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
-        TelephonyManager tm =
-            (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
-        
+        TelephonyManager tm = TelephonyManager.from(mContext);
         NetworkInfo ni_active = cm.getActiveNetworkInfo();
 
         return ni_active != null && ni_active.getTypeName().equalsIgnoreCase( "mobile" ) &&
@@ -271,8 +272,7 @@ public class SamsungU8500RIL extends RIL implements CommandsInterface {
             Rlog.d(RILJ_LOG_TAG, "Mobile Dataconnection is online setting it down");
             mDesiredNetworkType = networkType;
             mNetworktypeResponse = response;
-            TelephonyManager tm =
-                (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
+            TelephonyManager tm = TelephonyManager.from(mContext);
             //start listening for the connectivity change broadcast
             startListening();
             tm.setDataEnabled(false);
@@ -283,8 +283,7 @@ public class SamsungU8500RIL extends RIL implements CommandsInterface {
             switch(msg.what) {
             //networktype was set, now we can enable the dataconnection again
             case MESSAGE_SET_PREFERRED_NETWORK_TYPE:
-                TelephonyManager tm =
-                    (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
+                TelephonyManager tm = TelephonyManager.from(mContext);
 
                 Rlog.d(RILJ_LOG_TAG, "preferred NetworkType set upping Mobile Dataconnection");
                 tm.setDataEnabled(true);
@@ -319,55 +318,6 @@ public class SamsungU8500RIL extends RIL implements CommandsInterface {
                 }
             }
         }
-    }
-
-    @Override
-    protected RILRequest findAndRemoveRequestFromList(int serial) {
-        long removalTime = System.currentTimeMillis();
-        long timeDiff = 0;
-        RILRequest rr = null;
-
-        synchronized (mRequestList) {
-
-		rr = mRequestList.get(serial);
-
-                if (rr != null) {
-					mRequestList.remove(serial);
-                    return rr;
-                }
-                else
-                {
-                      // We need some special code here for the Samsung RIL,
-                      // which isn't responding to some requests.
-                      // We will print a list of such stale requests which
-                      // haven't yet received a response. If the timeout fires
-                      // first, then the wakelock is released without debugging.
-                    
-                    //timeDiff = removalTime - rr.creationTime;
-                    //if ( timeDiff > mWakeLockTimeout ) {
-                        Rlog.d(RILJ_LOG_TAG, "No response for [" + rr.mSerial + "] " +
-                                requestToString(rr.mRequest) + "."); // + " after " + timeDiff + " milliseconds.");
-
-                        /* Don't actually remove anything for now. Consider uncommenting this to
-                           purge stale requests */
-
-                        /*
-                        itr.remove();
-                        if (mRequestMessagesWaiting > 0) {
-                            mRequestMessagesWaiting--;
-                        }
-
-                        // We don't handle the callback (ie. rr.mResult) for
-                        // RIL_REQUEST_SET_TTY_MODE, which is
-                        // RIL_REQUEST_QUERY_TTY_MODE. The reason for not doing
-                        // so is because it will also not get a response from the
-                        // Samsung RIL
-                        rr.release();
-                        */
-                    //}
-                }
-            }
-        return null;
     }
 
     @Override
@@ -900,4 +850,30 @@ public class SamsungU8500RIL extends RIL implements CommandsInterface {
         Rlog.d(RILJ_LOG_TAG, "RIL_REQUEST_CDMA_GET_SUBSCRIPTION_SOURCE blocked!!!");
         //send(rr);
     }
+
+    // Hack for Lollipop
+    // The system now queries for SIM status before radio on, resulting
+    // in getting an APPSTATE_DETECTED state. The RIL does not send an
+    // RIL_UNSOL_RESPONSE_SIM_STATUS_CHANGED message after the SIM is
+    // initialized, so delay the message until the radio is on.
+    @Override
+    public void
+    getIccCardStatus(Message result) {
+        if (mState != RadioState.RADIO_ON) {
+            mPendingGetSimStatus = result;
+        } else {
+            super.getIccCardStatus(result);
+        }
+    }
+
+    @Override
+    protected void switchToRadioState(RadioState newState) {
+        super.switchToRadioState(newState);
+
+        if (newState == RadioState.RADIO_ON && mPendingGetSimStatus != null) {
+            super.getIccCardStatus(mPendingGetSimStatus);
+            mPendingGetSimStatus = null;
+        }
+    }
 }
+
