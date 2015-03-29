@@ -475,7 +475,7 @@ index 1dbb06f..3338a65 100644
  {
      // size
 diff --git a/libs/gui/Android.mk b/libs/gui/Android.mk
-index f9eff1c..cccab91 100644
+index 9770da2..033e764 100644
 --- a/libs/gui/Android.mk
 +++ b/libs/gui/Android.mk
 @@ -44,6 +44,7 @@ LOCAL_SHARED_LIBRARIES := \
@@ -840,7 +840,7 @@ index aa92ea0..4d2de12 100644
 diff --git a/services/surfaceflinger/DisplayDevice.cpp b/services/surfaceflinger/DisplayDevice.cpp
 old mode 100644
 new mode 100755
-index 76ab552..5180ffd
+index aaffec4..017b016
 --- a/services/surfaceflinger/DisplayDevice.cpp
 +++ b/services/surfaceflinger/DisplayDevice.cpp
 @@ -26,6 +26,9 @@
@@ -853,20 +853,25 @@ index 76ab552..5180ffd
  
  #include <gui/Surface.h>
  
-@@ -77,8 +80,12 @@ DisplayDevice::DisplayDevice(
+@@ -81,11 +84,14 @@ DisplayDevice::DisplayDevice(
        mPowerMode(HWC_POWER_MODE_OFF),
        mActiveConfig(0)
  {
 +#ifdef STE_HARDWARE
 +    ANativeWindow* const window = new FramebufferNativeWindow();
-+#else
++#elif defined(EGL_NEEDS_FNW)
      mNativeWindow = new Surface(producer, false);
-     ANativeWindow* const window = mNativeWindow.get();
-+#endif
+-#ifndef EGL_NEEDS_FNW
+-    ANativeWindow* const window = mNativeWindow.get();
+-#else
+     ANativeWindow* const window = new FramebufferNativeWindow();
++#else
++    mNativeWindow = new Surface(producer, false);
++    ANativeWindow* const window = mNativeWindow.get();
+ #endif
  
      /*
-      * Create our display's surface
-@@ -450,7 +457,12 @@ void DisplayDevice::setDisplaySize(const int newWidth, const int newHeight) {
+@@ -458,7 +464,12 @@ void DisplayDevice::setDisplaySize(const int newWidth, const int newHeight) {
  
      mDisplaySurface->resizeBuffers(newWidth, newHeight);
  
@@ -879,7 +884,7 @@ index 76ab552..5180ffd
      mSurface = eglCreateWindowSurface(mDisplay, mConfig, window, NULL);
      eglQuerySurface(mDisplay, mSurface, EGL_WIDTH,  &mDisplayWidth);
      eglQuerySurface(mDisplay, mSurface, EGL_HEIGHT, &mDisplayHeight);
-@@ -542,12 +554,19 @@ void DisplayDevice::dump(String8& result) const {
+@@ -550,12 +561,19 @@ void DisplayDevice::dump(String8& result) const {
      const Transform& tr(mGlobalTransform);
      result.appendFormat(
          "+ DisplayDevice: %s\n"
