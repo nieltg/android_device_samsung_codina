@@ -1,13 +1,59 @@
-# Device Tree for Samsung Galaxy Ace 2 (GT-I8160)
+# Device Tree for GT-I8160 (codina)
 
-Notes & Issues:
+I assume you have been familiar with CyanogenMod ROM development since this device tree is still buggy.
 
-- Replace `boot.img` inside the zip with `out/target/product/codina/kernel`
-  before flashing to your device or it will stuck at Samsung logo.
+Notes & issues I've encountered:
 
-- There is sdboot variant (install to 2nd & 3rd SD card partitions instead of
-  internal, EXPERIMENTAL) in this build system which you can activate by
-  making `rootdir/variants/current points` to `rootdir/variants/sdboot` and
-  add nieltg/codina-initramfs-sdboot@9e76caf6989d36e38c55c1ca7bfd7625090cfbbf
-  repository as `bootable/codinaramfs`.
+- InCallUI is shown very late & the Settings app is laggy.
+- The recorded video is green, but the audio is recorded well.
+- Flashlight is slow since it use camera interface. (should use sysfs interface)
+- WebView component is not being rendered. (black screen on Browser app)
+
+## Step 1: Local Manifests & Sync
+
+These are repositories I use. You can put this file on `.repo/local_manifests/codina.xml` or any name you want to use.
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest>
+	
+	<!-- kernels & bootables -->
+	<project path="kernel/codina/ace2nutzer" name="ace2nutzer/Samsung_STE_Kernel" revision="3.0.101" />
+	<project path="bootable/codinaramfs" name="nieltg/codina-initramfs-sdboot" revision="master" />
+	
+	<!-- cm11 base -->
+	<project path="vendor/samsung/u8500-common" name="TeamCanjica/android_vendor_samsung_u8500-common" revision="cm-11.0" />
+	
+	<!-- cm12 custom -->
+	<project path="device/samsung/codina" name="nieltg/android_device_samsung_codina" />
+	<project path="hardware/u8500" name="nieltg/android_hardware_u8500" />
+	
+</manifest>
+```
+
+## Step 2: Preparation
+
+Some repositories must be patched before building. I've provided a script to do that. You can execute these commands on your build root. You also should check `rootdir/variants/current` symlink in the device tree. Point it to default if you don't want to build sdboot variant which explanation you can read [here](https://github.com/nieltg/codina-initramfs-sdboot).
+
+```bash
+. build/envsetup.sh ; export USE_CCACHE=1
+device/samsung/codina/patches/patch.sh
+```
+
+## Step 3: Compile
+
+Like usual, there is nothing special here. On my system, it tooks about 4-5 hours to get a full build.
+
+```bash
+lunch cm_codina-eng
+time mka bacon
+```
+
+## Step 4: Modify Zip
+
+This device tree products flashable zip with invalid `boot.img` which is not the kernel. You must change it with raw kernel which is found at `out/target/product/codina/kernel`. Rename it to `boot.img` and put it back to the zip.
+
+For sdboot build, you can remove `boot.img` and its flashing routine in `update-script` to prevent reflashing same kernel. You can remove things are match with this pattern: `, \"capabilities\", (.*), \"selabel\", \"(.*)\"` if you're using older CWM like me.
+
+Then, you can __backup__ & flash the zip. __You do it all at your own risk!__
 
