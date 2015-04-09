@@ -1,0 +1,29 @@
+diff --git a/core/Makefile b/core/Makefile
+index 43c98e3..b22731f 100644
+--- a/core/Makefile
++++ b/core/Makefile
+@@ -1075,7 +1075,8 @@ SYSTEMIMAGE_SOURCE_DIR := $(TARGET_OUT)
+ # image size check calculation.
+ ifneq ($(INSTALLED_RECOVERYIMAGE_TARGET),)
+ intermediates := $(call intermediates-dir-for,PACKAGING,recovery_patch)
+-RECOVERY_FROM_BOOT_PATCH := $(intermediates)/recovery_from_boot.p
++#RECOVERY_FROM_BOOT_PATCH := $(intermediates)/recovery_from_boot.p
++RECOVERY_FROM_BOOT_PATCH := 
+ $(RECOVERY_FROM_BOOT_PATCH): $(INSTALLED_RECOVERYIMAGE_TARGET) \
+                              $(INSTALLED_BOOTIMAGE_TARGET) \
+ 			     $(HOST_OUT_EXECUTABLES)/imgdiff \
+diff --git a/tools/releasetools/common.py b/tools/releasetools/common.py
+index d70610d..2b7fdba 100755
+--- a/tools/releasetools/common.py
++++ b/tools/releasetools/common.py
+@@ -1200,6 +1200,10 @@ def ParseCertificate(data):
+ 
+ def MakeRecoveryPatch(input_dir, output_sink, recovery_img, boot_img,
+                       info_dict=None):
++  pass
++
++def MakeRecoveryPatch2(input_dir, output_sink, recovery_img, boot_img,
++                      info_dict=None):
+   """Generate a binary patch that creates the recovery image starting
+   with the boot image.  (Most of the space in these images is just the
+   kernel, which is identical for the two, so the resulting patch

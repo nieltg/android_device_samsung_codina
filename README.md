@@ -55,7 +55,7 @@ time mka bacon
 
 This device tree products flashable zip with invalid `boot.img` which is not the kernel. You must change it with raw kernel which is found at `out/target/product/codina/kernel`. Rename it to `boot.img` and put it back to the zip.
 
-For sdboot build, you can remove `boot.img` and its flashing routine in `update-script` to prevent flashing same kernel again and again. You also can remove things are match with this pattern: `, \"capabilities\", (.*), \"selabel\", \"(.*)\"` to prevent flashing errors if you are using older CWM like me.
+For sdboot build (and you have installed sdboot kernel), you can remove `boot.img` and its flashing routine in `update-script` to prevent flashing same kernel again and again. You also can remove things are match with this pattern: `, \"capabilities\", (.*), \"selabel\", \"(.*)\"` to prevent flashing errors if you are using older CWM like me.
 
 Then, you can __backup__ & flash the zip. __You do it all at your own risk!__
 
