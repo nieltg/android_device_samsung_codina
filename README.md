@@ -7,7 +7,6 @@ Notes & issues I've encountered:
 - InCallUI is shown very late & the Settings app is laggy.
 - The recorded video is green, but the audio is recorded well.
 - Flashlight is slow since it use camera interface. (should use sysfs interface)
-- WebView component is not being rendered. (black screen on Browser app)
 
 ## Step 1: Local Manifests & Sync
 
@@ -22,11 +21,11 @@ These are repositories I use. You can put this file on `.repo/local_manifests/co
 	<project path="bootable/codinaramfs" name="nieltg/codina-initramfs-sdboot" revision="master" />
 	
 	<!-- cm11 base -->
-	<project path="vendor/samsung/u8500-common" name="TeamCanjica/android_vendor_samsung_u8500-common" revision="cm-11.0" />
+	<project path="vendor/samsung/u8500-common" name="Dhoine/android_vendor_samsung_u8500-common" revision="cm-11.0" />
 	
 	<!-- cm12 custom -->
 	<project path="device/samsung/codina" name="nieltg/android_device_samsung_codina" />
-	<project path="hardware/u8500" name="nieltg/android_hardware_u8500" />
+	<project path="hardware/u8500" name="nieltg/android_hardware_u8500" revision="cm-12.0" />
 	
 </manifest>
 ```
@@ -47,8 +46,7 @@ device/samsung/codina/patches/patch.sh
 Like usual, there is nothing special here. On my system, it tooks about 4-5 hours to get a full build.
 
 ```bash
-lunch cm_codina-eng
-time mka bacon
+brunch codina
 ```
 
 ## Step 4: Modify Zip
