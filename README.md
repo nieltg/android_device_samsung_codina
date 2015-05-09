@@ -38,7 +38,7 @@ You also should check `rootdir/variants/current` symlink in the device tree. Poi
 
 ```bash
 . build/envsetup.sh ; export USE_CCACHE=1
-device/samsung/codina/patches/patch.sh
+device/samsung/codina/patches/patch-apply
 ```
 
 ## Step 3: Compile
