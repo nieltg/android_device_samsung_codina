@@ -1,0 +1,13 @@
+diff --git a/target/product/full_base.mk b/target/product/full_base.mk
+index 2ba2ced..1837f89 100644
+--- a/target/product/full_base.mk
++++ b/target/product/full_base.mk
+@@ -34,7 +34,7 @@ PRODUCT_LOCALES := en_US
+ PRODUCT_AAPT_CONFIG := normal
+ 
+ # Get some sounds
+-$(call inherit-product-if-exists, frameworks/base/data/sounds/AllAudio.mk)
++$(call inherit-product-if-exists, frameworks/base/data/sounds/AudioPackage13.mk)
+ 
+ # Get the TTS language packs
+ $(call inherit-product-if-exists, external/svox/pico/lang/all_pico_languages.mk)
