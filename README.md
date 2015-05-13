@@ -10,8 +10,6 @@ Issues I've encountered:
 
 __NOTE:__ This device tree supports 2 different build variant: default & sdboot variant. Use _default variant_ if you want to install the build into internal partition, but use _sdboot variant_ if you want to install the build into SD card which hacks is explained [here](https://github.com/nieltg/codina-initramfs-sdboot).
 
-Personally, I test my builds by installing them to my SD card. If you don't use _sdboot_, you can just modify `rootdir/variants/current` symlink and point it to `default` instead of `sdboot`. If you want to remove _sdboot_ completely, read these commits: [3b60524](https://github.com/nieltg/android_device_samsung_codina/commit/3b60524db27edfbd4204b23fd57847147471f4ce), [d426316](https://github.com/nieltg/android_device_samsung_codina/commit/d42631627a98e3fe56cbddf84204352efaa3b140), and [3c3bfa5](https://github.com/nieltg/android_device_samsung_codina/commit/3c3bfa57a89e57d9a780b152e3f9c53c33bd7c98) then revert things associated with sdboot.
-
 ## Step 1: Local Manifests & Sync
 
 These are repositories I use. You can put this file on `.repo/local_manifests/codina.xml` or any name you want to use.
@@ -22,13 +20,14 @@ These are repositories I use. You can put this file on `.repo/local_manifests/co
 	
 	<!-- kernels & bootables -->
 	<project path="kernel/codina/ace2nutzer" name="ace2nutzer/Samsung_STE_Kernel" revision="3.0.101" />
-	<project path="bootable/codinaramfs" name="nieltg/codina-initramfs-sdboot" revision="master" />
 	
 	<!-- cm11 base -->
 	<project path="vendor/samsung/u8500-common" name="Dhoine/android_vendor_samsung_u8500-common" revision="cm-11.0" />
 	
 	<!-- cm12 custom -->
 	<project path="device/samsung/codina" name="nieltg/android_device_samsung_codina" />
+	<project path="device/samsung/codina_sdboot" name="nieltg/android_device_samsung_codina_sdboot" />
+	
 	<project path="hardware/u8500" name="nieltg/android_hardware_u8500" revision="cm-12.0" />
 	
 </manifest>
@@ -38,8 +37,6 @@ These are repositories I use. You can put this file on `.repo/local_manifests/co
 
 Some repositories must be patched before building. I've provided a script to do that. You can execute these commands on your build root.
 
-You also should check `rootdir/variants/current` symlink in the device tree. Point it to `default` if you don't want to build _sdboot variant_ which explanation you can read [here](https://github.com/nieltg/codina-initramfs-sdboot).
-
 ```bash
 . build/envsetup.sh ; export USE_CCACHE=1
 codina-patch-apply
@@ -47,10 +44,16 @@ codina-patch-apply
 
 ## Step 3: Compile
 
-Like usual, there is nothing special here. On my system, it tooks about 4-5 hours to get a full build.
+You can execute this command to compile. On my system, it tooks about 4-5 hours to get a full build.
 
 ```bash
 brunch codina
+```
+
+If you want to compile _sdboot_ variant ROM, use this command instead.
+
+```bash
+brunch codina_sdboot
 ```
 
 ## Step 4: Modify Zip

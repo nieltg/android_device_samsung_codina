@@ -20,12 +20,6 @@ LOCAL_PATH := device/samsung/codina
 TARGET_SPECIFIC_HEADER_PATH := $(LOCAL_PATH)/include
 PRODUCT_VENDOR_KERNEL_HEADERS := $(LOCAL_PATH)/kernel-headers
 
-# Codinaramfs sdboot
-
-ifeq ($(shell cat $(LOCAL_PATH)/rootdir/fstab.samsungcodina | grep -q mmcblk1p2 ; echo $$?),0)
-DEVICE_CODINA_ENABLE_SDBOOT := true
-endif
-
 # Board
 TARGET_NO_BOOTLOADER := true
 TARGET_NO_RADIOIMAGE := true
@@ -78,7 +72,7 @@ BOARD_WPA_SUPPLICANT_PRIVATE_LIB := lib_driver_cmd_bcmdhd
 BOARD_HOSTAPD_DRIVER             := NL80211
 BOARD_HOSTAPD_PRIVATE_LIB        := lib_driver_cmd_bcmdhd
 
-ifeq ($(DEVICE_CODINA_ENABLE_SDBOOT),true)
+ifeq ($(TARGET_PRODUCT),cm_codina_sdboot)
 WIFI_DRIVER_MODULE_PATH          := "/lib/modules/dhd.ko"
 else
 WIFI_DRIVER_MODULE_PATH          := "/system/lib/modules/dhd.ko"
@@ -166,7 +160,7 @@ TARGET_OTA_ASSERT_DEVICE := codina,i8160,GT-I8160
 TARGET_KERNEL_SOURCE := kernel/codina/ace2nutzer
 TARGET_KERNEL_CONFIG := codina_ext4_defconfig
 
-ifeq ($(DEVICE_CODINA_ENABLE_SDBOOT),true)
+ifeq ($(TARGET_PRODUCT),cm_codina_sdboot)
 TARGET_PREBUILT_KERNEL = $(CODINARAMFS_KERNEL)
 endif
 
@@ -174,7 +168,11 @@ endif
 BOARD_BLUETOOTH_BDROID_BUILDCFG_INCLUDE_DIR := $(LOCAL_PATH)/configs/bluetooth/include
 
 # Recovery
+ifeq ($(TARGET_PRODUCT),cm_codina_sdboot)
+TARGET_RECOVERY_FSTAB := $(LOCAL_PATH)/rootdir/sdboot/fstab.samsungcodina
+else
 TARGET_RECOVERY_FSTAB := $(LOCAL_PATH)/rootdir/fstab.samsungcodina
+endif
 
 # Boot Animation
 TARGET_BOOTANIMATION_PRELOAD := true

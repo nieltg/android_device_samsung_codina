@@ -28,8 +28,14 @@ PRODUCT_PACKAGES += \
 
 # U8500 Common init
 PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/rootdir/init.u8500.rc:root/init.u8500.rc \
     $(LOCAL_PATH)/rootdir/init.u8500.usb.rc:root/init.u8500.usb.rc
+ifeq ($(TARGET_PRODUCT),cm_codina_sdboot)
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/rootdir/sdboot/init.u8500.rc:root/init.u8500.rc
+else
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/rootdir/init.u8500.rc:root/init.u8500.rc
+endif
 
 # Graphics
 PRODUCT_PROPERTY_OVERRIDES += \
@@ -195,11 +201,18 @@ $(call inherit-product, vendor/samsung/u8500-common/codina/codina-vendor-blobs.m
 # Init files
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/rootdir/device_tunables.rc:root/device_tunables.rc \
-    $(LOCAL_PATH)/rootdir/fstab.samsungcodina:root/fstab.samsungcodina \
     $(LOCAL_PATH)/rootdir/init.samsungcodina.rc:root/init.samsungcodina.rc \
-    $(LOCAL_PATH)/rootdir/init.recovery.samsungcodina.rc:root/init.recovery.samsungcodina.rc \
     $(LOCAL_PATH)/rootdir/ueventd.samsungcodina.rc:root/ueventd.samsungcodina.rc
-    
+ifeq ($(TARGET_PRODUCT),cm_codina_sdboot)
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/rootdir/sdboot/fstab.samsungcodina:root/fstab.samsungcodina \
+    $(LOCAL_PATH)/rootdir/sdboot/init.recovery.samsungcodina.rc:root/init.recovery.samsungcodina.rc
+else
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/rootdir/fstab.samsungcodina:root/fstab.samsungcodina \
+    $(LOCAL_PATH)/rootdir/init.recovery.samsungcodina.rc:root/init.recovery.samsungcodina.rc
+endif
+
 # STE Modem
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/ste_modem.sh:system/etc/ste_modem.sh
