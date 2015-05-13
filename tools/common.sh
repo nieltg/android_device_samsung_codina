@@ -339,7 +339,7 @@ pa_app_init ()
 	pa_log_init "$(basename "${BASH_SOURCE[1]}")"
 	[ "$?" -ne 0 ] && pa_app_fatal
 
-	pa_eng_init "$(dirname "${BASH_SOURCE[1]}")"
+	pa_eng_init "$(dirname "${BASH_SOURCE[1]}")/../patches"
 	[ "$?" -ne 0 ] && pa_app_fatal
 }
 
