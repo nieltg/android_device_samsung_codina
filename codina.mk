@@ -18,26 +18,18 @@ LOCAL_PATH := device/samsung/codina
 
 DEVICE_PACKAGE_OVERLAYS := $(LOCAL_PATH)/overlay
 
-# Our devices are HDPI
+# Define screen DPI
 PRODUCT_AAPT_CONFIG := normal hdpi
 PRODUCT_AAPT_PREF_CONFIG := hdpi
 
-# NovaThor Settings
+# NovaThor settings
 PRODUCT_PACKAGES += \
     NovaThorSettings
 
-# Media
-PRODUCT_COPY_FILES += \
-    frameworks/av/media/libstagefright/data/media_codecs_ffmpeg.xml:system/etc/media_codecs_ffmpeg.xml \
-    frameworks/av/media/libstagefright/data/media_codecs_google_audio.xml:system/etc/media_codecs_google_audio.xml \
-    frameworks/av/media/libstagefright/data/media_codecs_google_telephony.xml:system/etc/media_codecs_google_telephony.xml \
-    frameworks/av/media/libstagefright/data/media_codecs_google_video.xml:system/etc/media_codecs_google_video.xml
-
-# Wifi
+# Wi-Fi
 PRODUCT_PACKAGES += \
     libnetcmdiface \
     wpa_supplicant
-$(call inherit-product-if-exists, hardware/broadcom/wlan/bcmdhd/firmware/bcm4330/device-bcm.mk)
 
 # Audio
 PRODUCT_PACKAGES += \
@@ -46,24 +38,15 @@ PRODUCT_PACKAGES += \
     libaudioutils \
     libtinyalsa
 
-# U8500 Hardware
-$(call inherit-product, hardware/u8500/u8500.mk)
-
-# USB
-PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
-    persist.sys.usb.config=mtp \
-    persist.service.adb.enable=1
-
 # Charger
 PRODUCT_PACKAGES += \
     charger \
     charger_res_images
 
-# Misc Packages
+# Misc packages
 PRODUCT_PACKAGES += \
     com.android.future.usb.accessory \
-    SamsungServiceMode \
-    Torch
+    SamsungServiceMode
 
 # Filesystem management tools
 PRODUCT_PACKAGES += \
@@ -76,7 +59,32 @@ PRODUCT_PACKAGES += \
     fsck.f2fs \
     fibmap.f2fs
 
-# These are the hardware-specific features
+# Live wallpapers
+PRODUCT_PACKAGES += \
+    librs_jni
+
+# Dalvik VM config for 768MB RAM devices
+PRODUCT_TAGS += dalvik.gc.type-precise
+
+# USB
+PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
+    persist.sys.usb.config=mtp \
+    persist.service.adb.enable=1
+
+# U8500 hardware
+$(call inherit-product, hardware/u8500/u8500.mk)
+
+# Wi-Fi firmware
+$(call inherit-product-if-exists, hardware/broadcom/wlan/bcmdhd/firmware/bcm4330/device-bcm.mk)
+
+# Media
+PRODUCT_COPY_FILES += \
+    frameworks/av/media/libstagefright/data/media_codecs_ffmpeg.xml:system/etc/media_codecs_ffmpeg.xml \
+    frameworks/av/media/libstagefright/data/media_codecs_google_audio.xml:system/etc/media_codecs_google_audio.xml \
+    frameworks/av/media/libstagefright/data/media_codecs_google_telephony.xml:system/etc/media_codecs_google_telephony.xml \
+    frameworks/av/media/libstagefright/data/media_codecs_google_video.xml:system/etc/media_codecs_google_video.xml
+
+# Hardware-specific features
 PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.bluetooth_le.xml:system/etc/permissions/android.hardware.bluetooth_le.xml \
     frameworks/native/data/etc/android.hardware.bluetooth.xml:system/etc/permissions/android.hardware.bluetooth.xml \
@@ -102,13 +110,6 @@ PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.software.sip.xml:system/etc/permissions/android.software.sip.xml \
     frameworks/native/data/etc/handheld_core_hardware.xml:system/etc/permissions/handheld_core_hardware.xml \
     packages/wallpapers/LivePicker/android.software.live_wallpaper.xml:system/etc/permissions/android.software.live_wallpaper.xml
-
-# Live Wallpapers
-PRODUCT_PACKAGES += \
-    librs_jni
-
-# Dalvik VM config for 768MB RAM devices
-PRODUCT_TAGS += dalvik.gc.type-precise
 
 # Include blobs
 ifeq ($(TARGET_PRODUCT),cm_codina_sdboot)
