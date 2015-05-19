@@ -29,7 +29,10 @@ PRODUCT_PACKAGES += \
 # Wi-Fi
 PRODUCT_PACKAGES += \
     libnetcmdiface \
-    wpa_supplicant
+    wpa_supplicant \
+    libwpa_client \
+    hostapd \
+    dhcpcd.conf
 
 # Audio
 PRODUCT_PACKAGES += \
