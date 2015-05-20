@@ -66,6 +66,10 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     librs_jni
 
+# Configure ART (save /data partition)
+WITH_DEXPREOPT := true
+WITH_DEXPREOPT_PIC := true
+
 # Dalvik VM config for 768MB RAM devices
 PRODUCT_TAGS += dalvik.gc.type-precise
 
