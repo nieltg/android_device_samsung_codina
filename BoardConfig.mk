@@ -169,9 +169,9 @@ BOARD_BLUETOOTH_BDROID_BUILDCFG_INCLUDE_DIR := $(LOCAL_PATH)/configs/bluetooth/i
 
 # Recovery
 ifeq ($(TARGET_PRODUCT),cm_codina_sdboot)
-TARGET_RECOVERY_FSTAB := $(LOCAL_PATH)/rootdir/sdboot/fstab.samsungcodina
+TARGET_RECOVERY_FSTAB := $(LOCAL_PATH)/configs/root-sdboot/fstab.samsungcodina
 else
-TARGET_RECOVERY_FSTAB := $(LOCAL_PATH)/rootdir/fstab.samsungcodina
+TARGET_RECOVERY_FSTAB := $(LOCAL_PATH)/configs/root/fstab.samsungcodina
 endif
 
 # Boot Animation

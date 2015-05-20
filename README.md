@@ -4,7 +4,7 @@ I assume you have been familiar with CyanogenMod ROM development since this devi
 
 Issues I've encountered:
 
-- InCallUI is shown very late & the Settings app is laggy.
+- Creating a new user (multi-user mode) make the system crash.
 - The recorded video is green, but the audio is recorded well.
 - Flashlight is slow since it use camera interface. (should use sysfs interface)
 
