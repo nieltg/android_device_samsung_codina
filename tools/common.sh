@@ -5,7 +5,7 @@
 # + Text Formatting
 # +----
 
-pa_fmt_delim ()
+text_delim ()
 {
 	# ( delim, text... ) => in format: "text1 delim text2 delim textN..."
 
@@ -24,14 +24,14 @@ pa_fmt_delim ()
 	fi
 }
 
-pa_fmt_delim_comma ()
+text_delim_comma ()
 {
 	# ( text... ) => in format: "text1, text2, textN..."
 
-	echo "$(pa_fmt_delim ", " "$@")"
+	echo "$(text_delim ", " "$@")"
 }
 
-pa_fmt_plural ()
+text_plural ()
 {
 	# ( n, singular, [plural] ) => in format, ex: "3 apples", "1 boat"
 
@@ -51,7 +51,7 @@ pa_fmt_plural ()
 	fi
 }
 
-pa_fmt_summary_bracket ()
+text_summary_bracket ()
 {
 	# ( summary, desc. ) => in format: "summary (desc.)"
 
@@ -68,8 +68,8 @@ pa_fmt_summary_bracket ()
 # +----
 
 # Concept:
-# - pa_wri_* are made for pa_log_* to write to stdout/stderr
-# - Any other subsystems should use pa_log_* for logging mechanism
+# - pa_wri_* are made for log_* to write to stdout/stderr
+# - Any other subsystems should use log_* for logging mechanism
 
 pa_wri_e ()
 {
@@ -104,11 +104,11 @@ pa_wri_o_n ()
 # + Logging Interface
 # +----
 
-pa_log_init ()
+log_init ()
 {
 	# ( app_name ) => nul; print header
 
-	[ -n "${1}" ] || pa_app_assert
+	[ -n "${1}" ] || app_assert
 
 	PA_LOG_APP="${1}"
 
@@ -116,21 +116,21 @@ pa_log_init ()
 	pa_wri_e
 }
 
-pa_log_w ()
+log_w ()
 {
 	# ( msg ) => nul; log warning message
 	
 	pa_wri_e_n "${@}"
 }
 
-pa_log_e ()
+log_e ()
 {
 	# ( msg ) => nul; log error message
 	
 	pa_wri_e_n "${@}"
 }
 
-pa_log_assert ()
+log_assert ()
 {
 	# ( [n_skip] ) => nul; log call trace
 
@@ -155,7 +155,7 @@ pa_log_assert ()
 	pa_wri_e
 }
 
-pa_log_paths ()
+log_paths ()
 {
 	# ( nul ) => nul; log build top & patch directory
 	
@@ -164,7 +164,7 @@ pa_log_paths ()
 	pa_wri_e
 }
 
-pa_log_progress_prepare ()
+log_progress_prepare ()
 {
 	# ( work_count ) => nul; prepare for logging tasks
 
@@ -173,11 +173,11 @@ pa_log_progress_prepare ()
 	PA_LOG_TASK_PASS="0"
 }
 
-pa_log_progress_summary ()
+log_progress_summary ()
 {
 	# ( nul ) => nul; show summary & reset
 
-	local p="$(pa_fmt_plural "${PA_LOG_TASK}" task)"
+	local p="$(text_plural "${PA_LOG_TASK}" task)"
 
 	pa_wri_e
 	pa_wri_e "${PA_LOG_TASK_PASS} of ${p} done."
@@ -188,7 +188,7 @@ pa_log_progress_summary ()
 	PA_LOG_TASK_PASS="0"
 }
 
-pa_log_progress_start ()
+log_progress_start ()
 {
 	# ( msg ) => nul; print current progress
 
@@ -196,7 +196,7 @@ pa_log_progress_start ()
 	true
 }
 
-pa_log_progress_fini ()
+log_progress_fini ()
 {
 	# ( status, msg ) => nul; print progress summary
 
@@ -211,11 +211,11 @@ pa_log_progress_fini ()
 # + Patches Engine
 # +----
 
-# Patches format: [BASE]_[NAME].patch
-# [BASE]: base repo, ex: "frameworks/av" => "frameworks-av" ('/' => '-')
-# [NAME]: patch title, ex: "Audio Patch" => "Audio-Patch" (' ' => '-')
+# Patches format: [BASE]/[NAME].patch
+# [BASE]: base repo, ex: "frameworks_av" => "frameworks/av" ('_' => '/')
+# [NAME]: patch cap, ex: "Audio_Patches" => "Audio Patches" ('_' => ' ')
 
-pa_eng_init ()
+patch_init ()
 {
 	# ( nul ) => nul; initalize patch engine
 
@@ -226,77 +226,73 @@ pa_eng_init ()
 	# TODO: pa_ext_buildtop
 
 	if [ -z "${ANDROID_BUILD_TOP}" ] ; then
-		pa_log_e "\${ANDROID_BUILD_TOP} is not defined"
-		pa_log_e "build/envsetup.sh should be executed first!"
+		log_e "\${ANDROID_BUILD_TOP} is not defined"
+		log_e "build/envsetup.sh should be executed first!"
 		return 1
 	fi
 
-	pa_log_paths
+	log_paths
 }
 
-pa_eng_parse_repo ()
+patch_parse_repo ()
 {
-	# ( patch_file ) => base repo; in bracket: [BASE]_NAME.patch
+	# ( patch_file ) => base repo; in bracket: [BASE]/NAME.patch
 
-	local bn="$(basename ${1})"
-
-	local a="${bn%%_*}"
-	echo "${a//-//}"
+	local d="$(dirname ${1})"
+	local b="$(basename ${d})"
+	echo "${b//_//}"
 }
 
-pa_eng_parse_title ()
+patch_parse_title ()
 {
-	# ( patch_file ) => patch title; in bracket: BASE_[NAME].patch
+	# ( patch_file ) => patch title; in bracket: BASE/[NAME].patch
 
-	local bn="$(basename ${1})"
-
-	local a="${bn#*_}"
-	local b="${a%.patch}"
-	echo "${b//-/ }"
+	local b="$(basename ${1} .patch)"
+	echo "${b//_/ }"
 }
 
-pa_eng_patch_loop ()
+patch_patch_loop ()
 {
 	# ( func ( patch_file ) ) => nul; iterate through patches
 
-	[ -n "${PA_ENG_PATCH_DIR}" ] || pa_app_assert
-	[ -n "$(type -t "${1}")" ] || pa_app_assert
+	[ -n "${PA_ENG_PATCH_DIR}" ] || app_assert
+	[ -n "$(type -t "${1}")" ] || app_assert
 	# TODO: pa_ext_callable
 
-	local n_objs=( "${PA_ENG_PATCH_DIR}"/*.patch )
+	local n_objs=( "${PA_ENG_PATCH_DIR}"/*/*.patch )
 
-	pa_log_progress_prepare "${#n_objs[@]}"
+	log_progress_prepare "${#n_objs[@]}"
 
 	for ob in "${n_objs[@]}" ; do
 		"${1}" "${ob}"
 	done
 
-	pa_log_progress_summary
+	log_progress_summary
 }
 
-pa_eng_repo_loop ()
+patch_repo_loop ()
 {
 	# ( func ( base_repo ) ) => nul; iterate through repos
 
-	[ -n "${PA_ENG_PATCH_DIR}" ] || pa_app_assert
-	[ -n "$(type -t "${1}")" ] || pa_app_assert
+	[ -n "${PA_ENG_PATCH_DIR}" ] || app_assert
+	[ -n "$(type -t "${1}")" ] || app_assert
 	# TODO: pa_ext_callable
 
 	local -a n_repo
 
 	mapfile -t n_repo < <(
-		for pa in "${PA_ENG_PATCH_DIR}"/*.patch ; do
-			echo $(pa_eng_parse_repo "${pa}")
+		for pa in "${PA_ENG_PATCH_DIR}"/*/*.patch ; do
+			echo $(patch_parse_repo "${pa}")
 		done | uniq
 	)
 
-	pa_log_progress_prepare "${#n_repo[@]}"
+	log_progress_prepare "${#n_repo[@]}"
 
 	for ta in "${n_repo[@]}" ; do
 		"${1}" "${ta}"
 	done
 
-	pa_log_progress_summary
+	log_progress_summary
 }
 
 
@@ -304,23 +300,23 @@ pa_eng_repo_loop ()
 # + Basic Application
 # +----
 
-pa_app_assert ()
+app_assert ()
 {
 	# ( nul ) => nul; log assertion error & exit
 
-	pa_log_assert 1
+	log_assert 1
 	exit 1
 }
 
-pa_app_fatal ()
+app_fatal ()
 {
 	# ( [msg...] ) => nul; log assertion error & exit
 
-	[ "${#}" -gt 0 ] && pa_log_e "${@}"
+	[ "${#}" -gt 0 ] && log_e "${@}"
 	exit 1
 }
 
-pa_app_init ()
+app_init ()
 {
 	# ( args_func, args... ) => nul; process arguments & initalize
 
@@ -336,10 +332,14 @@ pa_app_init ()
 	#	esac
 	#done
 
-	pa_log_init "$(basename "${BASH_SOURCE[1]}")"
-	[ "$?" -ne 0 ] && pa_app_fatal
+	# TODO: remove there log_init & patch_init refs
+	# Apps should call them by theirself, ex: patcher call patch_init
+	# Subsystem should also call 'init's, ex: patcher_init call log_init
 
-	pa_eng_init "$(dirname "${BASH_SOURCE[1]}")/../patches"
-	[ "$?" -ne 0 ] && pa_app_fatal
+	log_init "$(basename "${BASH_SOURCE[1]}")"
+	[ "$?" -ne 0 ] && app_fatal
+
+	patch_init "$(dirname "${BASH_SOURCE[1]}")/../patches"
+	[ "$?" -ne 0 ] && app_fatal
 }
 

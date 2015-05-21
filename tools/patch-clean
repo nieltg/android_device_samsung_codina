@@ -3,7 +3,7 @@
 
 . $(dirname "${BASH_SOURCE[0]}")/common.sh
 
-pa_app_init "" "$@"
+app_init "" "$@"
 
 _clean_loop ()
 {
@@ -11,10 +11,10 @@ _clean_loop ()
 	
 	# [ -d "${1}" ] || pa_app_assert
 	
-	pa_log_progress_start "Cleaning ${1}... "
+	log_progress_start "Cleaning ${1}... "
 	( cd "${ANDROID_BUILD_TOP}/${1}" ; git checkout . ; git clean -f )
-	pa_log_progress_fini "$?" "${1}"
+	log_progress_fini "$?" "${1}"
 }
 
-pa_eng_repo_loop "_clean_loop"
+patch_repo_loop "_clean_loop"
 

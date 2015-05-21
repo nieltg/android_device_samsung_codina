@@ -3,7 +3,7 @@
 
 . $(dirname "${BASH_SOURCE[0]}")/common.sh
 
-pa_app_init "" "$@"
+app_init "" "$@"
 
 _patch_loop ()
 {
@@ -14,13 +14,13 @@ _patch_loop ()
 	# TODO: PA_ENG_PATCH_DIR in common.sh should be abspath
 	local n_absp="$(realpath "${1}")"
 	
-	local n_repo="$(pa_eng_parse_repo "${1}")"
-	local n_titl="$(pa_eng_parse_title "${1}")"
+	local n_repo="$(patch_parse_repo "${1}")"
+	local n_titl="$(patch_parse_title "${1}")"
 	
-	pa_log_progress_start "Applying ${n_titl}... "
+	log_progress_start "Applying ${n_titl}... "
 	( cd "${ANDROID_BUILD_TOP}/${n_repo}" ; patch -p1 < "${n_absp}" )
-	pa_log_progress_fini "$?" "${n_titl}"
+	log_progress_fini "$?" "${n_titl}"
 }
 
-pa_eng_patch_loop "_patch_loop"
+patch_patch_loop "_patch_loop"
 
