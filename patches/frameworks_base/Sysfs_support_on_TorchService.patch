@@ -1,0 +1,157 @@
+diff --git a/core/res/res/values/config.xml b/core/res/res/values/config.xml
+index 84c0e67..ba93d29 100755
+--- a/core/res/res/values/config.xml
++++ b/core/res/res/values/config.xml
+@@ -2328,4 +2328,14 @@
+     <string name="config_defaultQuickSettingsTiles">wifi,bt,cell,airplane,rotation,flashlight,location,cast</string>
+ 
+     <string-array name="config_externalCMServices"></string-array>
++    
++    <!-- If there is no sysfs-based control mechanism, enable this -->
++    <bool name="useCameraInterface">true</bool>
++    <!-- Full path to the sysfs toggle -->
++    <string name="flashDevice"></string>
++    <!-- Off setting -->
++    <integer name="valueOff">0</integer>
++    <!-- On setting -->
++    <integer name="valueOn">1</integer>
++    
+ </resources>
+diff --git a/core/res/res/values/symbols.xml b/core/res/res/values/symbols.xml
+index 9a57fb6..2ac79b6 100644
+--- a/core/res/res/values/symbols.xml
++++ b/core/res/res/values/symbols.xml
+@@ -2181,4 +2181,9 @@
+   <!-- From SignalStrength -->
+   <java-symbol type="integer" name="config_LTE_RSRP_threshold_type" />
+ 
++  <java-symbol type="bool" name="useCameraInterface" />
++  <java-symbol type="string" name="flashDevice" />
++  <java-symbol type="integer" name="valueOff" />
++  <java-symbol type="integer" name="valueOn" />
++
+ </resources>
+diff --git a/services/core/java/com/android/server/TorchService.java b/services/core/java/com/android/server/TorchService.java
+index 766d7ef..0ea99b5 100644
+--- a/services/core/java/com/android/server/TorchService.java
++++ b/services/core/java/com/android/server/TorchService.java
+@@ -48,6 +48,11 @@ import android.view.Surface;
+ import java.io.FileDescriptor;
+ import java.io.PrintWriter;
+ import java.util.ArrayList;
++import java.io.FileWriter;
++import java.io.File;
++import java.io.IOException;
++
++import com.android.internal.R;
+ 
+ import com.android.internal.R;
+ 
+@@ -106,6 +111,13 @@ public class TorchService extends ITorchService.Stub {
+         }
+     };
+ 
++    private static int mValueOff;
++    private static int mValueOn;
++    private static String mFlashDevice;
++    private static boolean mUseCameraInterface;
++
++    private FileWriter mFlashDeviceWriter = null;
++
+     private static class CameraUserRecord {
+         IBinder token;
+         int pid;
+@@ -120,6 +132,12 @@ public class TorchService extends ITorchService.Stub {
+ 
+     public TorchService(Context context) {
+         mContext = context;
++
++        mValueOff = mContext.getResources().getInteger(R.integer.valueOff);
++        mValueOn = mContext.getResources().getInteger(R.integer.valueOn);
++        mFlashDevice = mContext.getResources().getString(R.string.flashDevice);
++        mUseCameraInterface = mContext.getResources().getBoolean(R.bool.useCameraInterface);
++
+         mCamerasInUse = new SparseArray<CameraUserRecord>();
+         mCameraManager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
+         initialize();
+@@ -200,7 +218,7 @@ public class TorchService extends ITorchService.Stub {
+                 // As a synchronous broadcast is an expensive operation, only
+                 // attempt to kill torch if it actually grabbed the camera before
+                 if (cameraId == mTorchCameraId) {
+-                    if (mCamerasInUse.get(cameraId) != null) {
++                    if (!mUseCameraInterface || mCamerasInUse.get(cameraId) != null) {
+                         if (DEBUG) Log.d(TAG, "Need to kill torch");
+                         needTorchShutdown = true;
+                     }
+@@ -262,6 +280,14 @@ public class TorchService extends ITorchService.Stub {
+     public synchronized boolean isAvailable() {
+         mContext.enforceCallingOrSelfPermission(
+                 Manifest.permission.ACCESS_TORCH_SERVICE, null);
++        if (!mUseCameraInterface) {
++            /*
++             * nieltg: Use mTorchAvailable in 'return' statement
++             * So, torch will be disabled when the camera is used
++             */
++            File f = new File(mFlashDevice);
++            return mTorchAvailable && f.exists() && f.canWrite();
++        }
+         return mTorchAvailable;
+     }
+ 
+@@ -374,6 +400,32 @@ public class TorchService extends ITorchService.Stub {
+         return null;
+     }
+ 
++    private void writeToSysfs (boolean value) {
++        /*
++         * nieltg: Separate sysfs writing mechanism from updateFlashlight()
++         * So, changes at updateFlashlight() can be minimized (prevent failed-hunk)
++         */
++        if (mFlashDeviceWriter == null) {
++            try {
++                mFlashDeviceWriter = new FileWriter(mFlashDevice);
++            } catch (IOException e) {
++                Log.e(TAG, "Error creating new mFlashDeviceWriter");
++                handleError();
++            }
++        }
++        try {
++            mFlashDeviceWriter.write(String.valueOf(value ? mValueOn : mValueOff));
++            mFlashDeviceWriter.flush();
++            if (!value) {
++                mFlashDeviceWriter.close();
++                mFlashDeviceWriter = null;
++            }
++        } catch (IOException e) {
++            Log.e(TAG, "Error writing to flashlight sysfs", e);
++            handleError();
++        }
++    }
++
+     private void updateFlashlight(boolean forceDisable) {
+         try {
+             boolean enabled;
+@@ -381,6 +433,15 @@ public class TorchService extends ITorchService.Stub {
+                 enabled = mTorchEnabled && !forceDisable;
+             }
+             if (enabled) {
++                if (!mUseCameraInterface) {
++                    /*
++                     * nieltg: Handle requests to turn on sysfs-torch here (only)
++                     * Handle turn off requests on teardownTorch() instead of here
++                     */
++                    writeToSysfs (enabled);
++                    dispatchStateChange(true);
++                    return;
++                }
+                 if (mCameraDevice == null) {
+                     if (!mOpeningCamera) {
+                         startDevice();
+@@ -422,6 +483,7 @@ public class TorchService extends ITorchService.Stub {
+     private void teardownTorch() {
+         setListenForScreenOff(false);
+         dispatchStateChange(false);
++        if (!mUseCameraInterface) writeToSysfs (false);
+         if (mCameraDevice != null) {
+             mCameraDevice.close();
+             mCameraDevice = null;
