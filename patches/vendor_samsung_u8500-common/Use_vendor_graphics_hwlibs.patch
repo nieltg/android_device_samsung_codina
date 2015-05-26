@@ -1,0 +1,19 @@
+diff --git a/codina/codina-vendor-blobs.mk b/codina/codina-vendor-blobs.mk
+index ea7b0db..5001b52 100644
+--- a/codina/codina-vendor-blobs.mk
++++ b/codina/codina-vendor-blobs.mk
+@@ -78,10 +78,10 @@ PRODUCT_COPY_FILES += \
+     $(LOCAL_PATH)/system/etc/wifi/nvram_net.txt:system/etc/wifi/nvram_net.txt
+ 
+ # Display
+-#PRODUCT_COPY_FILES += \
+-#    $(LOCAL_PATH)/system/lib/hw/gralloc.montblanc.so:system/lib/hw/gralloc.montblanc.so \
+-#    $(LOCAL_PATH)/system/lib/hw/hwcomposer.montblanc.so:system/lib/hw/hwcomposer.montblanc.so \
+-#    $(LOCAL_PATH)/system/lib/hw/copybit.montblanc.so:system/lib/hw/copybit.montblanc.so
++PRODUCT_COPY_FILES += \
++    $(LOCAL_PATH)/system/lib/hw/gralloc.montblanc.so:system/lib/hw/gralloc.montblanc.so \
++    $(LOCAL_PATH)/system/lib/hw/hwcomposer.montblanc.so:system/lib/hw/hwcomposer.montblanc.so \
++    $(LOCAL_PATH)/system/lib/hw/copybit.montblanc.so:system/lib/hw/copybit.montblanc.so
+ 
+ # GPS
+ PRODUCT_COPY_FILES += \

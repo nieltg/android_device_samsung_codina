@@ -1,0 +1,20 @@
+diff --git a/dex2oat/dex2oat.cc b/dex2oat/dex2oat.cc
+index c411472..d9fbdac 100644
+--- a/dex2oat/dex2oat.cc
++++ b/dex2oat/dex2oat.cc
+@@ -710,11 +710,11 @@ class WatchDog {
+   // Debug builds are slower so they have larger timeouts.
+   static const unsigned int kSlowdownFactor = kIsDebugBuild ? 5U : 1U;
+ #if ART_USE_PORTABLE_COMPILER
+-  // 30 minutes scaled by kSlowdownFactor.
+-  static const unsigned int kWatchDogTimeoutSeconds = kSlowdownFactor * 30 * 60;
++  // 60 minutes scaled by kSlowdownFactor.
++  static const unsigned int kWatchDogTimeoutSeconds = kSlowdownFactor * 60 * 60;
+ #else
+-  // 6 minutes scaled by kSlowdownFactor.
+-  static const unsigned int kWatchDogTimeoutSeconds = kSlowdownFactor * 6 * 60;
++  // 30 minutes scaled by kSlowdownFactor.
++  static const unsigned int kWatchDogTimeoutSeconds = kSlowdownFactor * 30 * 60;
+ #endif
+ 
+   bool is_watch_dog_enabled_;
