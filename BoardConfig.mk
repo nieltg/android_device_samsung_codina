@@ -116,9 +116,7 @@ TARGET_USE_CUSTOM_LUN_FILE_PATH := "/sys/devices/platform/musb-ux500.0/musb-hdrc
 BOARD_CHARGING_MODE_BOOTING_LPM := /sys/devices/virtual/power_supply/battery/lpm_mode
 
 # Recovery
-BOARD_CUSTOM_GRAPHICS := $(LOCAL_PATH)/configs/recovery/graphics.c
 BOARD_UMS_LUNFILE := "/sys/devices/platform/musb-ux500.0/musb-hdrc/gadget/lun0/file"
-BOARD_CUSTOM_RECOVERY_KEYMAPPING := $(LOCAL_PATH)/configs/recovery/recovery_keys.c
 BOARD_USES_MMCUTILS := true
 BOARD_HAS_NO_MISC_PARTITION := true
 BOARD_HAS_NO_SELECT_BUTTON := true

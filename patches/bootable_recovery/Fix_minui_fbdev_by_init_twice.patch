@@ -1,0 +1,26 @@
+diff --git a/minui/graphics_fbdev.c b/minui/graphics_fbdev.c
+index 956db8e..74a7a27 100644
+--- a/minui/graphics_fbdev.c
++++ b/minui/graphics_fbdev.c
+@@ -78,7 +78,7 @@ static void set_displayed_framebuffer(unsigned n)
+     displayed_buffer = n;
+ }
+ 
+-static gr_surface fbdev_init(minui_backend* backend) {
++static gr_surface fbdev_init_real(minui_backend* backend) {
+     int fd;
+     void *bits;
+ 
+@@ -177,6 +177,12 @@ static gr_surface fbdev_init(minui_backend* backend) {
+     return gr_draw;
+ }
+ 
++static gr_surface fbdev_init(minui_backend* backend) {
++	fbdev_init_real (backend);
++	fbdev_exit (backend);
++	return fbdev_init_real (backend);
++}
++
+ static gr_surface fbdev_flip(minui_backend* backend __unused) {
+     if (double_buffered) {
+ #if defined(RECOVERY_BGRA)
