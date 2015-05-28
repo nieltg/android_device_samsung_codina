@@ -156,7 +156,7 @@ TARGET_OTA_ASSERT_DEVICE := codina,i8160,GT-I8160
 
 # Kernel
 TARGET_KERNEL_SOURCE := kernel/codina/ace2nutzer
-TARGET_KERNEL_CONFIG := codina_ext4_defconfig
+TARGET_KERNEL_CONFIG := codina_defconfig
 
 ifeq ($(TARGET_PRODUCT),cm_codina_sdboot)
 TARGET_PREBUILT_KERNEL = $(CODINARAMFS_KERNEL)
