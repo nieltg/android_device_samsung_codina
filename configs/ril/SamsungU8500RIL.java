@@ -881,5 +881,64 @@ public class SamsungU8500RIL extends RIL implements CommandsInterface {
             mPendingGetSimStatus = null;
         }
     }
+
+    // Hack for Lollipop
+    // System expects addresses, not gateways
+    @Override
+    protected DataCallResponse getDataCallResponse(Parcel p, int version) {
+        DataCallResponse dataCall = new DataCallResponse();
+
+        dataCall.version = version;
+        if (version < 5) {
+            dataCall.cid = p.readInt();
+            dataCall.active = p.readInt();
+            dataCall.type = p.readString();
+            if (version < 4 || needsOldRilFeature("datacallapn")) {
+                p.readString(); // APN - not used
+            }
+            String addresses = p.readString();
+            if (!TextUtils.isEmpty(addresses)) {
+                dataCall.addresses = addresses.split(" ");
+            }
+            // DataCallState needs an ifname. Since we don't have one use the name from the ThrottleService resource (default=rmnet0).
+            dataCall.ifname = Resources.getSystem().getString(com.android.internal.R.string.config_datause_iface);
+        } else {
+            dataCall.status = p.readInt();
+            if (needsOldRilFeature("usehcradio"))
+                dataCall.suggestedRetryTime = -1;
+            else
+          dataCall.suggestedRetryTime = p.readInt();
+            dataCall.cid = p.readInt();
+            dataCall.active = p.readInt();
+            dataCall.type = p.readString();
+            dataCall.ifname = p.readString();
+            if ((dataCall.status == DcFailCause.NONE.getErrorCode()) &&
+                    TextUtils.isEmpty(dataCall.ifname)) {
+              throw new RuntimeException("getDataCallResponse, no ifname");
+            }
+            String addresses = p.readString();
+            if (!TextUtils.isEmpty(addresses)) {
+                dataCall.addresses = addresses.split(" ");
+            }
+            String dnses = p.readString();
+            if (!TextUtils.isEmpty(dnses)) {
+                dataCall.dnses = dnses.split(" ");
+            }
+            p.readString();
+            if (!TextUtils.isEmpty(addresses)) {
+                dataCall.gateways = dataCall.addresses;
+            }
+            if (version >= 10) {
+                String pcscf = p.readString();
+                if (!TextUtils.isEmpty(pcscf)) {
+                    dataCall.pcscf = pcscf.split(" ");
+                }
+            }
+            if (version >= 11) {
+                dataCall.mtu = p.readInt();
+            }
+        }
+        return dataCall;
+    }
 }
 
