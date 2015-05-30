@@ -1,0 +1,21 @@
+diff --git a/src/com/android/calculator2/Calculator.java b/src/com/android/calculator2/Calculator.java
+index 4f0f35f..bb89d10 100644
+--- a/src/com/android/calculator2/Calculator.java
++++ b/src/com/android/calculator2/Calculator.java
+@@ -204,6 +204,7 @@ public class Calculator extends Activity
+         mEvaluator.evaluate(mFormulaEditText.getText(), this);
+         mFormulaEditText.setTextColor(getResources().getColor(R.color.display_formula_text_color));
+         mDeleteButton.setOnLongClickListener(this);
++        mClearButton.setOnLongClickListener(this);
+         mResultEditText.setTextColor(getResources().getColor(R.color.display_result_text_color));
+         mResultEditText.setEnabled(false);
+ 
+@@ -429,7 +430,7 @@ public class Calculator extends Activity
+     @Override
+     public boolean onLongClick(View view) {
+         mCurrentButton = view;
+-        if (view.getId() == R.id.del) {
++        if (view.getId() == R.id.del || view.getId() == R.id.clr) {
+             onClear();
+             return true;
+         }
