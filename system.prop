@@ -7,6 +7,13 @@ ro.zygote.disable_gl_preload=1
 ro.bq.gpu_to_cpu_unsupported=1
 debug.sf.hw=1
 debug.hwui.render_dirty_regions=false
+# hwui
+ro.hwui.drop_shadow_cache_size=1
+ro.hwui.gradient_cache_size=0.2
+ro.hwui.layer_cache_size=6
+ro.hwui.path_cache_size=2
+ro.hwui.r_buffer_cache_size=1
+ro.hwui.texture_cache_size=8
 # Wi-Fi
 wifi.interface=wlan0
 wifi.supplicant_scan_interval=150
