@@ -18,6 +18,14 @@ These are repositories I use. You can put this file on `.repo/local_manifests/co
 <?xml version="1.0" encoding="UTF-8"?>
 <manifest>
 	
+	<!-- toolchains -->
+	<remove-project name="CyanogenMod/android_build" />
+	<remove-project name="platform/prebuilts/gcc/linux-x86/arm/arm-eabi-4.8" />
+	<remove-project name="platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.8" />
+	<project path="build" name="ArchiDroid/android_build" />
+	<project name="ArchiDroid/Toolchain" path="prebuilts/gcc/linux-x86/arm/arm-eabi-4.8" revision="architoolchain-4.9-arm-linux-gnueabihf-cortex_a9_neon" />
+	<project name="ArchiDroid/Toolchain" path="prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.8" revision="sabermod-4.8-arm-linux-androideabi" />
+	
 	<!-- kernels & bootables -->
 	<project path="kernel/codina/ace2nutzer" name="ace2nutzer/Samsung_STE_Kernel" revision="3.0.101" />
 	
